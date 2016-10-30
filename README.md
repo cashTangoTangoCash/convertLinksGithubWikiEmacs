@@ -1,59 +1,68 @@
-# orgFixLinks, a Python Utility
+# convertLinksGithubWikiEmacs, a Python Utility
 
-This is a script in this category: <http://orgmode.org/worg/org-tools/>
+## problem to be solved
 
-I wrote over *800 org files*, which reside on my local disk.  They consist of
-simple notes with links to websites and other files on local disk.  **_Broken
-links_** would naturally occur as I made changes to files on local disk.  Files
-for some of my favorite subjects would often be replete with broken links,
-leaving me unable to make more notes.  I could not find a solution online.  I am
-an **amateur** who has been spending some time learning python, but still has a
-lot to learn, and this project seemed like the next thing to try.
+I was just putting my first project (`orgFixLinks`) up on Github, and wanted to
+write a Github Wiki to explain it.  I wanted to write in `emacs` **on my local
+machine rather than on Github.com**.  I
+found <http://jblevins.org/projects/markdown-mode/> and thought I had everything
+I would need.  I wrote the whole wiki in `emacs` and the local previews (C-c C-c v
+Export and View) looked fine.  I uploaded the wiki to Github and **the links to
+.md files were not working as intended**.  On clicking a link, Github would show
+the raw file instead of showing something that looks like a web page.
 
-*I have read almost zero org mode documentation*.  I use org mode to keep simple
-notes, and am mostly interested in quickly looking up information in my
-collection of org files.  When links are broken, my org files greatly diminish
-in usefulness.
+I spent some time googling.  I emailed Github for help.  The best I could come
+up with (by experimenting with a dummy repository in Github) is that **a link that
+works in `emacs` is formatted differently than a link that works in a Github wiki**:
 
+![Fig 1: link format in emacs vs on Github wiki](2016-10-30_11-56-07EmacsVsGithubFormatForLinks.jpg)
 
-The goals of this script:
+Now I had about 46 .md files to convert.  To work locally again, I would need to
+convert back.
 
-1.  repair links (inside an org file) to files on local disk
+A related problem: I am not aware
+if <http://jblevins.org/projects/markdown-mode/> **tests for broken links**.
+Once a wiki gets larger, it would be nice to know if any links are broken before
+uploading to Github.
 
-2.  add a [header](header.md) to an org file; header is a list of incoming links, outgoing
-    links, and tags
+## solution approach
 
+The language I have been trying to learn is `python`, so I wrote a `python`
+script that **converts all .md files in a chosen folder (but not in
+subfolders)** so that the links inside are converted from either `emacs` format
+to Github wiki format, or Github wiki format to `emacs` format.  This script
+runs in the terminal (no GUI).
 
-The script is a command line utility to be used in the terminal.
+To convert links inside a file means the file is rewritten on disk.
 
-## Warnings and State of Development
-**WARNING** this python script is amateur work
+Additionally, a log file is written.  **Warnings in the log file indicate which
+links are broken**, if any.
 
-**WARNING** bugs are still regularly appearing.  Comprehensively testing this code is not easy.
-
-**WARNING** it can screw up your org files (backup first;
-dry run mode first)
-
-**WARNING** it does not recognize all possible org file characteristics and may trample
-them (backup first; dry run mode first)
-
-**WARNING** org mode can change and this script can break as a result
-
-**WARNING** intended for experienced users only
-
-**WARNING** script does not self-test in any way
-
-**WARNING** tags that are all caps are changed to all lowercase; if you know
-python, this is easy to change
-
-It's amateur work that overwrites files on your local disk.  **_If you are not
-ready, willing, and able to restore all your files from backups, don't run this._**
+A second `python` script uses the unittest module to attempt to verify that the
+main script operates as intended.  By reading this script, a user can clearly
+identify what the main script is attempting to do.  Not every feature is tested.
 
 ## Installation
-	
-**WARNING**  only known to work in Ubuntu 14.04, with default bash
 
+### emacs installation
 
+GNU Emacs 24.3.1 (x86_64-pc-linux-gnu, GTK+ Version 3.10.7)
+ of 2014-03-07 on lamiak, modified by Debian
+
+<http://jblevins.org/projects/markdown-mode/>
+
+I got stuck at: M-x package-install RET markdown-mode RET.  Got unstuck by
+googling the error message and finding: 
+
+<http://emacs.stackexchange.com/questions/10831/tried-to-install-package-got-error-during-download-request-not-found>
+
+Also, I found the .emacs setup by terdon in
+
+<http://superuser.com/questions/552888/auto-load-gfm-mode>
+
+to be useful.
+
+### python installation
 recommended but optional: set up a virtual environment (<http://docs.python-guide.org/en/latest/dev/virtualenvs/>)
 
 
@@ -122,61 +131,34 @@ urwid (1.3.1)
 
 ## Usage
 
-In terminal, typing `orgFixLinks -h` prints the usage message:
+### using the main script convertLinksGithubWikiEmacs.py
 
->flags with no input argument:
+In terminal, typing `python convertLinksGithubWikiEmacs.py -h` prints the usage message:
 
->-h, --help: show this help blurb
-
->-u, --userFixesLinks: when automatic link repair fails and it makes sense to do so, prompt user to fix broken links manually (menu-driven)
-
->-n, --noSpideringStopViaKeystroke: disable stopping spidering via typing anything then hitting enter key
-
->-d, --debug:  run script in pudb.  require -n flag to enable pudb (pudb cannot do multithreading, which is required for stopping spidering by hitting return)
-
->-D, --dryRun:  make no changes to org files on disk.  make a copy of database and make changes to the copy.  suggestion: alternate between dry run and normal mode in a test sequence.
-
->-l, --showLog:  use pager less to display log file after operating on each org file; this gives you time to inspect a rewritten org file in dry run mode before it's reverted to original
-
->-b, --noBackup: do not make .bak copy of org file before replacing it on disk
-
->-q, --quickMode: when a file has been recently spidered, just look up outward links in database and move to next file to spider, rather than making full representation, repairing links, etc;  intention is to speed things up
-
+> use case: using emacs to work on .md files which are for a github wiki
+> script rewrites all .md files in a local folder so that links to other .md files match a format.
+> default is to change from emacs github flavored format (description)[filename.md] to github website format (description)[filename]
 > 
-
->flags that require input argument:
-
->-f, --inputFile:  supply a file to begin spidering; if no -f, all org files in /home/username/Documents are walked
-
->-L, --loggingLevel:  logging to take place above this level.  valid inputs: None, debug, info, warning, error, critical;  default value None
-
->-N, --maxFilesToSpider:  max number of files to spider, an integer
-
->-t, --maxTimeToSpider: max time to spend spidering (seconds)
-
+> flags with no input argument:
+> -h, --help: show this help blurb
+> -e, --emacsLinks: convert .md files so that links to other .md files match emacs github flavored wiki format (add .md)
+> -t, --testLinks: test if links are working; output goes in log file
 > 
-
->`python -O`:  `-O` flag turns off assert statements in the script `orgFixLinks.py`.  Assert statements identify associated preconfigured error conditions.  Suppressing them via `-O` flag speeds up script execution.
-
+> flags with input argument:
+> -f, --folder:  give the folder where there are .md files to be converted
+> -L, --loggingLevel: do not log at or below.  None, debug, info, warning, error, or critical.
 > 
+> example call:
+> python convertLinksGithubWikiEmacs.py -e -f /home/userName/Documents
 
->When spidering in dry run mode, the `-O` flag is needed to suppress an error in which the database shows a unique ID for a file, but the file does not contain this unique ID
+To specify a default folder, please edit the main script.
 
->(because the file was not rewritten on disk in a dry run)
+## testing the main script
 
-> 
-
->example call:
-
->python -O OrgModeFileCrawler01.py -uD -f /home/userName/Documents/myOrgFilename.org -N 20 -t 300
-
-
-For further details, please see the Github wiki for this project.
+Run tests (`python` unit tests) by typing in terminal:
+`python convertLinksGithubWikiEmacsTest.py`
 
 ## Contributing
-
-Does this script need more work?  No doubt.  I would think there is at least
-something useful in it.  It does run on my machine.
 
 Boilerplate from <https://gist.github.com/zenorocha/4526327>:
 
@@ -190,23 +172,23 @@ Boilerplate from <https://gist.github.com/zenorocha/4526327>:
 > 
 > 5. Submit a pull request :D
 
-I am a total beginner with Github.  I make no promises in terms of maintaining
-anything.  You can at least fork.  If I can comprehend your changes (far more likely
+You can at least fork.  If I can comprehend your changes (far more likely
 if verbosely documented), I am much more likely to accept a pull request.
 Submissions must respect intellectual property rights of work they are
 derived from (e.g. citing stackexchange).
 
 I put this project on Github because it would make me happy if someone got use
-from it.  It would be exciting to see a better programmer improve it.  I am not
-offering no-cost tech support or no-cost tutoring.
+from it.
 
 ## Credits
 
-This is an **amateur** python script originally developed by the github user
+This is an **amateur** `python` script originally developed by the github user
 cashTangoTangoCash.
 
-The script contains comments which credit sources of code snippets
-found on e.g. <http://programmers.stackexchange.com/>.
+Dive Into Python for a good detailed tutorial of the unittest module
+
+If applicable, the script contains comments which credit sources of code
+snippets found on e.g. <http://programmers.stackexchange.com/>.
 
 ## License
 
@@ -214,14 +196,3 @@ GNU General Public License v3.0
 
 See: LICENSE.txt
 
-## Acknowledgments
-
-Particularly helpful:
-
-The free online book **Python for Informatics Exploring Information** by
-Severance: the Twitter spidering example in Ch 14 provided the idea for this script.
-
-The Gauld Tutorial <http://www.alan-g.me.uk/tutor/index.htm>
-
-I am well aware that I did not read and understand everything, and have much
-more to learn.

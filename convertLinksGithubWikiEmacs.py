@@ -1,6 +1,7 @@
 # 20161021 finding that wiki pages that link to each other in emacs do not work as desired on github
 # the links that work in emacs do not work in github, and vice versa
-# use python to transform from one to the other, since want to edit wiki on desktop instead of on github
+# use python to transform from one to the other, since want to edit wiki in emacs instead of on github
+# see README.txt
 
 import sys
 import getopt
@@ -10,11 +11,6 @@ import glob
 import pudb
 import logging
 import datetime
-
-# testing a copy of a wiki in ~/Documents/Computer/Software/GithubNotes/PyConvertLinksInWikiEmacs2Github/tempDir20161022
-
-#TODO logging is only set up when __name__=="__main__"; if want to test via unittest in convert..Test.py, need to change this 
-#TODO caution with default value of folder1=os.getcwd(); this gets evaluated at start of script
 
 #head
 def remove_md_from_links_in_line(line,folder1=os.getcwd(),testLinks=False):
@@ -84,7 +80,6 @@ def add_md_to_links_in_line(line,folder1=os.getcwd(),testLinks=False):
     '''
 
     #TODO only convert a link from [descr](link) to [descr](link.md) if link.md exists in folder1
-    #TODO do not convert [descr](link.ext) to [descr](link.ext.md)
 
     os.chdir(folder1)
 
@@ -119,7 +114,6 @@ def add_md_to_links_in_line(line,folder1=os.getcwd(),testLinks=False):
 
         else:
             newLinePieces.append(piece)
-
         
     newLine=''.join(newLinePieces)
     return newLine
@@ -175,7 +169,7 @@ def set_up_logging(loggingLevel=None):
         doNotLogAtOrBelow=None
 
     #http://stackoverflow.com/questions/9135936/want-datetime-in-logfile-name
-    #TODO how to tell logging module to put the log file in a particular folder?
+
     # logFilename=datetime.datetime.now().strftime('%Y%m%d_%H%MConvertLinksMarkdownEmacsGithub.log')
     logFilename=os.path.join(origFolder,datetime.datetime.now().strftime('%Y%m%d_%H%MConvertLinksMarkdownEmacsGithub.log'))
 
@@ -229,7 +223,7 @@ def usage():
     -L, --loggingLevel: do not log at or below.  None, debug, info, warning, error, or critical.
 
     example call:
-    python convertLinksInWikiEmacs2Github.py -e -f /home/userName/Documents
+    python convertLinksGithubWikiEmacs.py -e -f /home/userName/Documents
     '''
     print messg1
 
@@ -238,11 +232,10 @@ origFolder=os.getcwd()
 #head MAIN
 if __name__=="__main__":
 
-    #initialize variables that could be changed via command line inputs
-    # localFolderWithWiki='/home/dad84/Documents/Computer/Software/OrgModeNotes/MyOrgModeScripts/OrgModeFileCrawler/githubWikiStart20161013'
-    #this is a copy of a github wiki for testing
-    localFolderWithWiki='/home/dad84/Documents/Computer/Software/GithubNotes/PyConvertLinksInWikiEmacs2Github/tempDir20161022'
-    assert os.path.exists(localFolderWithWiki), 'folder %s written into script as default does not exist on filesystem' % localFolderWithWiki
+    #default folder to convert
+    localFolderWithWiki=None
+    # localFolderWithWiki=os.path.join(origFolder,'tempDir20161022')
+    # assert os.path.exists(localFolderWithWiki), 'folder %s written into script as default does not exist on filesystem' % localFolderWithWiki
     convertFun=convert_md_files_to_github_online_wiki_fmt
 
     loggingLevel=None
@@ -268,7 +261,7 @@ if __name__=="__main__":
             testLinks=True
 
         elif opt in ("-f","--folder"):
-            localFolderWithWiki=arg
+            localFolderWithWiki=os.path.abspath(arg)
             assert os.path.exists(localFolderWithWiki), 'folder %s supplied via command line input does not exist on filesystem' % arg
 
         elif opt in ("-L","--loggingLevel"):
@@ -276,6 +269,10 @@ if __name__=="__main__":
             loggingLevel=arg
 
     # pudb.set_trace()
+
+    if not localFolderWithWiki:
+        print 'Please specify a folder to convert .md files in; use -f command line switch\n\n'
+        sys.exit()
 
     os.chdir(localFolderWithWiki)
 
