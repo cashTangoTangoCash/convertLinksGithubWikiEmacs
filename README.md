@@ -136,19 +136,27 @@ urwid (1.3.1)
 In terminal, typing `python convertLinksGithubWikiEmacs.py -h` prints the usage message:
 
 > use case: using emacs to work on .md files which are for a github wiki
+
 > script rewrites all .md files in a local folder so that links to other .md files match a format.
+
 > default is to change from emacs github flavored format (description)[filename.md] to github website format (description)[filename]
 > 
 > flags with no input argument:
+
 > -h, --help: show this help blurb
+
 > -e, --emacsLinks: convert .md files so that links to other .md files match emacs github flavored wiki format (add .md)
+
 > -t, --testLinks: test if links are working; output goes in log file
 > 
 > flags with input argument:
+
 > -f, --folder:  give the folder where there are .md files to be converted
+
 > -L, --loggingLevel: do not log at or below.  None, debug, info, warning, error, or critical.
 > 
 > example call:
+
 > python convertLinksGithubWikiEmacs.py -e -f /home/userName/Documents
 
 To specify a default folder, please edit the main script.
@@ -172,20 +180,20 @@ Boilerplate from <https://gist.github.com/zenorocha/4526327>:
 > 
 > 5. Submit a pull request :D
 
-You can at least fork.  If I can comprehend your changes (far more likely
-if verbosely documented), I am much more likely to accept a pull request.
-Submissions must respect intellectual property rights of work they are
-derived from (e.g. citing stackexchange).
+You can at least fork.  If I can comprehend your changes (far more likely if
+verbosely documented), I am much more likely to accept a pull request.  Write a
+test in [convertLinksGithubWikiEmacsTest.py](https://github.com/cashTangoTangoCash/convertLinksGithubWikiEmacs/blob/master/convertLinksGithubWikiEmacsTest.py) for
+your changes.  Submissions must respect intellectual property rights of work
+they are derived from (e.g. citing stackexchange).
 
-I put this project on Github because it would make me happy if someone got use
-from it.
+I put this project on Github because it would make me happy if someone found it useful.
 
 ## Credits
 
 This is an **amateur** `python` script originally developed by the github user
-cashTangoTangoCash.
+[cashTangoTangoCash](https://github.com/cashTangoTangoCash).
 
-Dive Into Python for a good detailed tutorial of the unittest module
+The book [Dive Into Python](http://www.diveintopython.net/) gives a good detailed tutorial of the unittest module.
 
 If applicable, the script contains comments which credit sources of code
 snippets found on e.g. <http://programmers.stackexchange.com/>.
@@ -194,5 +202,5 @@ snippets found on e.g. <http://programmers.stackexchange.com/>.
 
 GNU General Public License v3.0
 
-See: LICENSE.txt
+See: [LICENSE.txt](https://github.com/cashTangoTangoCash/convertLinksGithubWikiEmacs/blob/master/LICENSE.txt)
 
